@@ -1,0 +1,143 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Péndulo simple | Simulador</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand">
+      <div class="dot"></div>
+      <div>
+        <div class="title">Péndulo simple (matemático)</div>
+        <div class="subtitle">Estudia T teórico vs T medido, energía y dinámica θ(t)</div>
+      </div>
+    </div>
+    <div class="actions">
+      <button id="btnStart" class="btn primary">Iniciar</button>
+      <button id="btnReset" class="btn">Reiniciar</button>
+      <button id="btnResetMeasure" class="btn">Reiniciar medición</button>
+      <button id="btnCSV" class="btn">Exportar CSV</button>
+    </div>
+  </header>
+
+  <main class="layout">
+    <section class="panel">
+      <h2>Controles</h2>
+
+      <div class="grid2">
+        <label class="switchRow">
+          <span>Modelo no lineal (sin θ≈sinθ)</span>
+          <input id="nonlinearToggle" type="checkbox" checked>
+        </label>
+
+        <label class="switchRow">
+          <span>Amortiguamiento</span>
+          <input id="dampingToggle" type="checkbox">
+        </label>
+      </div>
+
+      <div class="control">
+        <div class="row">
+          <span>Longitud L (m)</span>
+          <span class="val" id="LVal"></span>
+        </div>
+        <input id="L" type="range" min="0.20" max="2.00" step="0.01" value="1.00">
+      </div>
+
+      <div class="control">
+        <div class="row">
+          <span>Masa m (kg)</span>
+          <span class="val" id="mVal"></span>
+        </div>
+        <input id="m" type="range" min="0.05" max="2.00" step="0.01" value="0.30">
+      </div>
+
+      <div class="control">
+        <div class="row">
+          <span>Ángulo inicial θ₀ (°)</span>
+          <span class="val" id="th0Val"></span>
+        </div>
+        <input id="th0" type="range" min="1" max="60" step="1" value="20">
+        <div class="hint">Tip: también puedes arrastrar la masa para fijar θ₀.</div>
+      </div>
+
+      <div class="control">
+        <div class="row">
+          <span>Gravedad g (m/s²)</span>
+          <span class="val" id="gVal"></span>
+        </div>
+        <input id="g" type="range" min="1.60" max="12.00" step="0.01" value="9.81">
+      </div>
+
+      <div class="control">
+        <div class="row">
+          <span>Amortiguamiento β (1/s)</span>
+          <span class="val" id="betaVal"></span>
+        </div>
+        <input id="beta" type="range" min="0.00" max="1.50" step="0.01" value="0.15">
+        <div class="hint">Solo aplica si activas “Amortiguamiento”.</div>
+      </div>
+
+      <h2>Magnitudes</h2>
+      <div class="cards">
+        <div class="card"><div class="k">T teórico (pequeño ángulo)</div><div class="v" id="Ttheory"></div></div>
+        <div class="card"><div class="k">f teórica</div><div class="v" id="ftheory"></div></div>
+
+        <div class="card"><div class="k">θ(t)</div><div class="v" id="thetaNow"></div></div>
+        <div class="card"><div class="k">ω(t)</div><div class="v" id="omegaNow"></div></div>
+
+        <div class="card"><div class="k">Energía total E</div><div class="v" id="Enow"></div></div>
+        <div class="card"><div class="k">T medido</div><div class="v" id="Tmeasured">—</div></div>
+
+        <div class="card"><div class="k">Ciclos contados</div><div class="v" id="cyclesCount">0</div></div>
+        <div class="card"><div class="k">T promedio (últimos 10)</div><div class="v" id="Tavg">—</div></div>
+      </div>
+
+      <h2>Registro (últimas 10 muestras)</h2>
+      <div class="tableWrap">
+        <table class="dataTable">
+          <thead>
+            <tr>
+              <th>t (s)</th>
+              <th>θ (°)</th>
+              <th>ω (rad/s)</th>
+              <th>T medido (s)</th>
+              <th>ciclos</th>
+            </tr>
+          </thead>
+          <tbody id="dataBody"></tbody>
+        </table>
+      </div>
+
+      <div class="note">
+        <b>Modelo:</b> θ¨ + 2β θ˙ + (g/L) sin(θ) = 0 (no lineal).<br>
+        En modo pequeño ángulo: sin(θ) ≈ θ.<br>
+        <b>Medición:</b> se mide T por cruces de θ=0 con ω&gt;0 (una vez por período).
+      </div>
+    </section>
+
+    <section class="stage">
+      <div class="canvasWrap">
+        <canvas id="simCanvas"></canvas>
+        <div class="dragTip">Arrastra la masa para cambiar θ₀</div>
+      </div>
+
+      <div class="plots">
+        <div class="plotCard">
+          <div class="plotTitle">Gráfica θ(t)</div>
+          <canvas id="thetaPlot"></canvas>
+        </div>
+        <div class="plotCard">
+          <div class="plotTitle">Gráfica ω(t)</div>
+          <canvas id="omegaPlot"></canvas>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <script src="app.js"></script>
+</body>
+</html>
